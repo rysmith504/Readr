@@ -66,6 +66,7 @@
     "express": "^4.17.1",
     "gabi": "^1.0.2",
     "gapi": "0.0.3",
+    "google-map-react": "^2.1.10",
     "googleapis": "^39.2.0",
     "html-webpack-plugin": "^4.5.0",
     "husky": "^4.3.0",
