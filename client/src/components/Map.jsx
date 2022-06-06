@@ -1,12 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
-// import useSwr from"swr";
-import GoogleMapReact from 'google-map-react';
-// import useSupercluster from"use-supercluster";
+// // import useSwr from"swr";
+// import GoogleMapReact from 'google-map-react';
+// // import useSupercluster from"use-supercluster";
 import {
   GoogleMap,
-  useLoadScript,
-  setMap
+  useLoadScript
 } from '@react-google-maps/api';
+
+const {
+  withScriptjs,
+  withGoogleMap,
+  Marker,
+} = require('react-google-maps');
+const { SearchBox } = require('react-google-maps/lib/components/places/SearchBox');
+
 import '../styles.css';
 const libraries = ['places'];
 const center = {
@@ -14,14 +21,13 @@ const center = {
   lng: -90.081970
 };
 const mapContainerStyle = {
-  padding: '4rem',
+  paddingTop: '4rem',
   width: '50vw',
   height: '50vh'
 };
 
-
 let service;
-let infowindow;
+let infoWindow;
 let map;
 
 const Map = () => {
@@ -31,12 +37,9 @@ const Map = () => {
     const superdome = new google.maps.LatLng(center.lat, center.lng);
   
     map = new google.maps.Map(document.getElementById('map'), {
-      padding: '4rem',
       mapContainerStyle: mapContainerStyle,
-      width: '50vw',
-      height: '50vh',
       center: superdome,
-      zoom: 10
+      zoom: 12
     });
   
     const request = {
@@ -45,12 +48,16 @@ const Map = () => {
       type: ['book_store']
     };
   
+    infoWindow = new google.maps.InfoWindow();
     service = new google.maps.places.PlacesService(map);
     service.nearbySearch(request, callback);
   };
   
-  const callback = (results, status) => {
+  const callback = (results, status) => { 
     console.log(results);
+    navigator.geolocation.getCurrentPosition(function(position) {
+      console.log(position, 'POSOISIDSOFN');
+    });
     if (status === google.maps.places.PlacesServiceStatus.OK) {
       for (let i = 0; i < results.length; i++) {
         createMarker(results[i]);
@@ -65,9 +72,9 @@ const Map = () => {
     googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
     libraries
   });
-  if (loadError) { return 'Error loading maps'; }
+  if (loadError) { return 'Error loading maps'; } 
   if (!isLoaded) { return 'Loading Maps'; }
-  // const [stores, setStores] = React.useState([]);
+  // const [stores, setStores] = React.useState([]); 
   // initialize();
   const createMarker = (place) => {
     const placeLoc = place.geometry.location;
@@ -77,24 +84,26 @@ const Map = () => {
     });
   
     google.maps.event.addListener(marker, 'click', function() {
-      infowindow.setContent(place.name);
-      infowindow.open(map, this);
+      infoWindow.setContent([place.name, place.vicinity, place.rating]);
+      infoWindow.open(map, this);
     });
   };
   return (
-    <div id='map' style={{paddingTop: '6rem', width: '50vw', height: '50vh'}}>
-      <GoogleMap
-        padding={'4rem'}
-        mapContainerStyle={mapContainerStyle}
-        bootstrapURLKeys={{ key: process.env.GOOGLE_MAPS_API_KEY }}
-        center={ center }
-        zoom={10}
-        onTilesLoaded={initialize}
-      >
-        {/*markers*/}
-      </GoogleMap>
+    <div style={{paddingTop: '4rem', width: '50vw', height: '50vh'}}>
+      <div id='map' style={{paddingTop: '4rem', width: '50vw', height: '50vh'}}>
+        <GoogleMap
+          onTilesLoaded={initialize}
+          mapContainerStyle={mapContainerStyle}
+          bootstrapURLKeys={{ key: process.env.GOOGLE_MAPS_API_KEY }}
+          center={ center }
+          zoom={12}
+        >
+          {/*markers*/}
+        </GoogleMap>
+      </div>
     </div>
   );
 };
 
 export default Map;
+
