@@ -34,17 +34,20 @@ const Map = () => {
 
   const initialize = () => {
     
-    const superdome = new google.maps.LatLng(center.lat, center.lng);
+    const userLocation = navigator.geolocation.getCurrentPosition(function(pos) {
+      console.log(pos);
+      return { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    });
   
     map = new google.maps.Map(document.getElementById('map'), {
       mapContainerStyle: mapContainerStyle,
-      center: superdome,
+      center: nagigato,
       zoom: 12
     });
   
     const request = {
       location: superdome,
-      radius: '24140.16',
+      radius: '150000',
       type: ['book_store']
     };
   
@@ -53,7 +56,7 @@ const Map = () => {
     service.nearbySearch(request, callback);
   };
   
-  const callback = (results, status) => { 
+  const callback = (results, status) => {
     console.log(results);
     navigator.geolocation.getCurrentPosition(function(position) {
       console.log(position, 'POSOISIDSOFN');
@@ -72,9 +75,9 @@ const Map = () => {
     googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
     libraries
   });
-  if (loadError) { return 'Error loading maps'; } 
+  if (loadError) { return 'Error loading maps'; }
   if (!isLoaded) { return 'Loading Maps'; }
-  // const [stores, setStores] = React.useState([]); 
+  // const [stores, setStores] = React.useState([]);
   // initialize();
   const createMarker = (place) => {
     const placeLoc = place.geometry.location;
